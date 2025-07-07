@@ -384,21 +384,30 @@ Each call must be matched with PyGILState_Release"}
   @library*)
 
 
-(def ^:dynamic *manual-gil*
-  "Make original `manual-gil` to be dynamic so that it can be set
-  using `binding` form without depending on the `-Dlibpython_clj.manual_gil=true` flag.
-  This is my attempt to avoid the `check-gil` function racing with the
-  `pytorch` library, which depends on the GIL being captured."
+(def manual-gil
   (= "true" (System/getProperty "libpython_clj.manual_gil")))
+
+
+(def ^:dynamic *runtime-gil-check-enabled?*
+  "This is set to true when the GIL is captured manually, e.g. in `with-manual-gil`.
+  Code that depends on `manual-gil` should check this variable to see if a runtime
+  GIL check is required.
+  This is set to the inverse of `manual-gil` so that it is true when the GIL is not manually captured.
+  It can be bound dynamically at runtime with `binding` form to change runtime behavior.
+  This is my attempt to avoid the `check-gil` function racing with the `pybind11::take_gil`
+  that `pytorch` uses to capture the GIL, without depending on the `-Dlibpython_clj.manual_gil=true` flag."
+
+  (not manual-gil))
 
 
 (defmacro check-gil
   "Maybe the most important insurance policy"
   []
-  (when-not *manual-gil*
-    `(errors/when-not-error
-      (= 1 (PyGILState_Check))
-      "GIL is not captured")))
+  (when-not manual-gil
+    `(when ~'*runtime-gil-check-enabled?*
+       (errors/when-not-error
+          (= 1 (PyGILState_Check))
+          "GIL is not captured"))))
 
 
 ;;When this is true, generated functions will throw an exception if called when the
@@ -762,21 +771,23 @@ Each call must be matched with PyGILState_Release"}
 (defmacro with-gil
   "Grab the gil and use the main interpreter using reentrant acquire-gil pathway."
   [& body]
-  (if *manual-gil*
-    `(let [retval# (do ~@body)]
-       (check-error-throw)
-       retval#)
-    `(let [gil-state# (when-not (== 1 (unchecked-long (PyGILState_Check)))
-                        (PyGILState_Ensure))]
-       (try
-         (let [retval# (do ~@body)]
-           (check-error-throw)
-           retval#)
-         (finally
-           (when gil-state#
-             #_(System/gc)
-             (pygc/clear-reference-queue)
-             (PyGILState_Release gil-state#)))))))
+  (let [exec-body `(let [retval# (do ~@body)]
+                     (check-error-throw)
+                     retval#)]
+    (if manual-gil
+       exec-body
+       `(if ~'*runtime-gil-check-enabled?*
+          (let [gil-state# (when-not (== 1 (unchecked-long (PyGILState_Check)))
+                             (PyGILState_Ensure))]
+            (try
+                ~exec-body
+              (finally
+                (when gil-state#
+                  #_(System/gc)
+                  (pygc/clear-reference-queue)
+                  (PyGILState_Release gil-state#)))))
+          ~exec-body))))
+
 
 
 (defn pyobject-type
