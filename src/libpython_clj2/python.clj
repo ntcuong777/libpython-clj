@@ -195,8 +195,7 @@ user> (py/py. np linspace 2 3 :num 10)
   pathways.
 
   In case the `-Dlibpython_clj.manual_gil=true` option is not set and it is called at runtime,
-  the macro will enable the dynamic flag `*runtime-manual-gil*` to true and wrap the body
-  with the GIL locker.
+  the user is expected to enable the dynamic flag `*runtime-manual-gil*` to true.
 
 ```clojure
   (with-manual-gil
@@ -204,17 +203,9 @@ user> (py/py. np linspace 2 3 :num 10)
 ```
   "
   [& body]
-  (let [gil-manage-body `(with-open [locker# (py-ffi/manual-gil-locker)]
-                           ~@body)]
-    (if py-ffi/manual-gil
-      ;; If the option `-Dlibpython_clj.manual_gil=true` is set,
-      ;; use the manual gil locker directly and depends on user
-      ;; to ensure that the code accessing python is wrapped in this macro.
-      gil-manage-body
-      ;; Else, enable the dynamic flag `*runtime-manual-gil*` to true and
-      ;; call the Python code with the gil managed by the `manual-gil-locker`.
-      `(binding [py-ffi/*runtime-manual-gil* true]
-         ~gil-manage-body))))
+  `(with-open [locker# (py-ffi/manual-gil-locker)]
+     ~@body))
+
 
 
 (defmacro with-manual-gil-stack-rc-context
