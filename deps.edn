@@ -4,9 +4,7 @@
         net.java.dev.jna/jna    {:mvn/version "5.12.1"}
         org.clojure/data.json   {:mvn/version "1.0.0"}
         ;;Replace me with caffeine...
-        com.google.guava/guava  {:mvn/version "31.1-jre"}
-        ;;Make it work on JDK 21
-        org.ow2.asm/asm {:mvn/version "9.8"}}
+        com.google.guava/guava  {:mvn/version "31.1-jre"}}
 
  :aliases {:dev
            {:extra-deps {criterium/criterium {:mvn/version "0.4.5"}
@@ -30,7 +28,7 @@
                         :name "libpython-clj"
                         :group-id "clj-python"
                         :artifact-id "libpython-clj"
-                        :version "2.028-CHRIST-SNAPSHOT"
+                        :version "2.027-CHRIST-SNAPSHOT"
                         :description "Python bindings for Clojure"
                         :metadata {:doc/format :markdown}
                         :google-analytics "G-LN7PG6FJ2D"

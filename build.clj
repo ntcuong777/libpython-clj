@@ -3,7 +3,7 @@
 
 ;; 1) your Maven coordinates
 (def lib      'clj-python/libpython-clj)
-(def version  "2.028-CHRIST-SNAPSHOT")
+(def version  "2.027-CHRIST-SNAPSHOT")
 
 ;; 2) where we'll compile and package
 (def class-dir "target/classes")

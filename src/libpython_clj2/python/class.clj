@@ -150,8 +150,8 @@
 
 
 (comment
-  (def cls-obj*)
-
+  (def cls-obj*
+)
   (@cls-obj* (jvm-handle/make-jvm-object-handle
               #(println "in python:" %)))
 
@@ -188,4 +188,5 @@
                  "clsattr" 55}))
 
   (def inst (cls-obj "ACME" 50 90))
-  (py-fn/call-attr inst "cost"))
+  (py-fn/call-attr inst "cost")
+  )
