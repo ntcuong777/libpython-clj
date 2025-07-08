@@ -1,5 +1,18 @@
 # Deep Clojure/Python Integration
 
+### Fork Remarks
+
+This fork is create just to make `libpython-clj` suits better to **my personal needs**. This is a space where I can freely experiment
+without depending on the original author.
+
+The modifications here will most probably not get merged into the parent project. To be able to contribute means I need to spend a lot
+of time in reading the one true documentation (i.e., code) and understand the overall view and the details carefully.
+
+Nevertheless, if I found there are changes worth merging, I will try and contribute as I also aim towards being able to call Python 
+freely from Clojure, and tap into the vast ecosystem of Python algorithmic libraries for ML, LLMs, etc.
+
+Information below are cloned as-is from the original project.
+
 ### Version Info
 
 [![Clojars Project](https://img.shields.io/clojars/v/clj-python/libpython-clj.svg)](https://clojars.org/clj-python/libpython-clj)
