@@ -384,12 +384,7 @@ Each call must be matched with PyGILState_Release"}
   @library*)
 
 
-(def ^:dynamic *manual-gil*
-  "Make original `manual-gil` to be dynamic so that it can be set
-  using `binding` form without depending on the `-Dlibpython_clj.manual_gil=true` flag.
-  This is my attempt to avoid the `check-gil` function racing with the
-  `pytorch` library, which depends on the GIL being captured."
-  (= "true" (System/getProperty "libpython_clj.manual_gil")))
+(def ^:dynamic *manual-gil* (= "true" (System/getProperty "libpython_clj.manual_gil")))
 
 
 (defmacro check-gil
