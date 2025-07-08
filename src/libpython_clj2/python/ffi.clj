@@ -397,14 +397,14 @@ Each call must be matched with PyGILState_Release"}
   This is my attempt to avoid the `check-gil` function racing with the `pybind11::take_gil`
   that `pytorch` uses to capture the GIL, without depending on the `-Dlibpython_clj.manual_gil=true` flag."
 
-  manual-gil)
+  (not manual-gil))
 
 
 (defmacro check-gil
   "Maybe the most important insurance policy"
   []
   (when-not manual-gil
-    `(when-not *runtime-manual-gil*
+    `(when *runtime-manual-gil*
        (errors/when-not-error
           (= 1 (PyGILState_Check))
           "GIL is not captured"))))
@@ -776,7 +776,7 @@ Each call must be matched with PyGILState_Release"}
                      retval#)]
     (if manual-gil
        exec-body
-       `(if (not *runtime-manual-gil*)
+       `(if *runtime-manual-gil*
           (let [gil-state# (when-not (== 1 (unchecked-long (PyGILState_Check)))
                              (PyGILState_Ensure))]
             (try
