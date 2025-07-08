@@ -107,8 +107,8 @@ Python eval pathway calls/ms 2646.0478013509883
              #^{:static true} [copyToJVM [Object] Object]
              #^{:static true} [createArray [String Object Object] Object]
              #^{:static true} [arrayToJVM [Object] java.util.Map]
-             #^{:static true} [copyData [Object Object] Object]]
-   ))
+             #^{:static true} [copyData [Object Object] Object]]))
+
 
 
 (set! *warn-on-reflection* true)
@@ -211,43 +211,43 @@ Python eval pathway calls/ms 2646.0478013509883
 
 
 #_(defn- to-python
-  "Support for auto-converting primitive arrays and array-of-arrays into python."
-  [item]
-  (let [item-type (type item)]
-    (if (.contains array-types item-type)
-      (if-let [len-getter (get primitive-arrays item-type)]
-        (-createArray (len-getter :datatype)
-                      [((len-getter :length) item)]
-                      item)
-        ;;potential 2d array if all lengths match
-        (let [^objects item item
-              item-len (alength item)
-              [datatype shape]
-              (when-let [fitem (when-not (== 0 item-len)
-                                 (aget item 0))]
-                (let [ary-entry (get primitive-arrays (type fitem))
-                      inner-len (get ary-entry :length)
-                      ary-dt (get ary-entry :datatype)
-                      fitem-len (unchecked-long (inner-len fitem))
-                      matching?
-                      (loop [idx 1
-                             matching? true]
-                        (if (< idx item-len)
-                          (recur (unchecked-inc idx)
-                                 (and matching?
-                                      (== fitem-len
-                                          (unchecked-long
-                                           (if-let [inner-item (aget item idx)]
-                                             (inner-len inner-item)
-                                             0)))))
-                          matching?))]
-                  (when matching?
-                    [ary-dt [item-len fitem-len]])))]
-          (if shape
-            (-createArray datatype shape item)
-            ;;slower fallback for ragged arrays
-            (@->python* item))))
-      (@->python* item))))
+   "Support for auto-converting primitive arrays and array-of-arrays into python."
+   [item]
+   (let [item-type (type item)]
+     (if (.contains array-types item-type)
+       (if-let [len-getter (get primitive-arrays item-type)]
+         (-createArray (len-getter :datatype)
+                       [((len-getter :length) item)]
+                       item)
+         ;;potential 2d array if all lengths match
+         (let [^objects item item
+               item-len (alength item)
+               [datatype shape]
+               (when-let [fitem (when-not (== 0 item-len)
+                                  (aget item 0))]
+                 (let [ary-entry (get primitive-arrays (type fitem))
+                       inner-len (get ary-entry :length)
+                       ary-dt (get ary-entry :datatype)
+                       fitem-len (unchecked-long (inner-len fitem))
+                       matching?
+                       (loop [idx 1
+                              matching? true]
+                         (if (< idx item-len)
+                           (recur (unchecked-inc idx)
+                                  (and matching?
+                                       (== fitem-len
+                                           (unchecked-long
+                                            (if-let [inner-item (aget item idx)]
+                                              (inner-len inner-item)
+                                              0)))))
+                           matching?))]
+                   (when matching?
+                     [ary-dt [item-len fitem-len]])))]
+           (if shape
+             (-createArray datatype shape item)
+             ;;slower fallback for ragged arrays
+             (@->python* item))))
+       (@->python* item))))
 
 
 (def ^:private fast-dict-set-item*

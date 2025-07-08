@@ -665,7 +665,7 @@ nil
   [x method-name & args]
   ;; method-name cast to a string specifically for go and go-loop
   ;; compatability
-  `(~#'$a ~x ~(str method-name) ~@args))
+  `(~#'$a ~x ~(py-fn/key-sym-str->str method-name) ~@args))
 
 
 (defmacro py*
@@ -706,7 +706,7 @@ nil
    (if (list? form)
      (let [form-data (vec form)
            [instance-member & args] form-data
-           symbol-str (str instance-member)]
+           symbol-str (py-fn/key-sym-str->str instance-member)]
        (cond
          (clojure.string/starts-with? symbol-str "-")
          (list #'py.- x (symbol (subs symbol-str 1 (count symbol-str))))
