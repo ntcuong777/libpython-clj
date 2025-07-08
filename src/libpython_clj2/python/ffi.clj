@@ -388,7 +388,7 @@ Each call must be matched with PyGILState_Release"}
   (= "true" (System/getProperty "libpython_clj.manual_gil")))
 
 
-(def ^:dynamic *runtime-manual-gil*
+(def ^:dynamic *runtime-gil-check-enabled?*
   "This is set to true when the GIL is captured manually, e.g. in `with-manual-gil`.
   Code that depends on `manual-gil` should check this variable to see if a runtime
   GIL check is required.
@@ -404,7 +404,7 @@ Each call must be matched with PyGILState_Release"}
   "Maybe the most important insurance policy"
   []
   (when-not manual-gil
-    `(when *runtime-manual-gil*
+    `(when ~'*runtime-gil-check-enabled?*
        (errors/when-not-error
           (= 1 (PyGILState_Check))
           "GIL is not captured"))))
@@ -776,7 +776,7 @@ Each call must be matched with PyGILState_Release"}
                      retval#)]
     (if manual-gil
        exec-body
-       `(if *runtime-manual-gil*
+       `(if ~'*runtime-gil-check-enabled?*
           (let [gil-state# (when-not (== 1 (unchecked-long (PyGILState_Check)))
                              (PyGILState_Ensure))]
             (try

@@ -135,7 +135,7 @@
        (py-ffi/PyObject_GetAttrString item (stringable item-name))
        (py-ffi/with-decref [item-name (py-ffi/untracked->python item-name ->python)]
          (py-ffi/PyObject_GetAttr item item-name)))
-     (py-ffi/simplify-or-track)))
+        (py-ffi/simplify-or-track)))
   (set-attr! [item item-name item-value]
     (let [item-val (->python item-value)]
       (if (stringable? item-name)
