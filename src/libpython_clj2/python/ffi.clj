@@ -58,7 +58,7 @@
                      :argtypes [['argc :int32]
                                 ['argv-wide-ptr-ptr :pointer]
                                 ['update :int32]]
-                   :doc "Set the argv/argc for the interpreter.
+                     :doc "Set the argv/argc for the interpreter.
 Required for some python modules"}
    :Py_SetProgramName {:rettype :void
                        :requires-gil? false
@@ -209,9 +209,9 @@ Each call must be matched with PyGILState_Release"}
                               ['kwargs :pointer?]]
                    :doc "Call a callable object"}
    :PyObject_CallObject {:rettype :pointer
-                   :argtypes [['callable :pointer]
-                              ['args :pointer?]]
-                   :doc "Call a callable object with no kwargs.  args may be nil"}
+                         :argtypes [['callable :pointer]
+                                    ['args :pointer?]]
+                         :doc "Call a callable object with no kwargs.  args may be nil"}
    :PyMapping_Check {:rettype :int32
                      :argtypes [['pyobj :pointer]]
                      :doc "Check if this object implements the mapping protocol"}
@@ -229,11 +229,11 @@ Each call must be matched with PyGILState_Release"}
                                    ['idx :size-t]]
                         :doc "Get a specific item from a sequence"}
    :PyFloat_AsDouble {:rettype :float64
-                     :argtypes [['pyobj :pointer]]
+                      :argtypes [['pyobj :pointer]]
                        :doc "Get a double value from a python float"}
    :PyFloat_FromDouble {:rettype :pointer
-                       :argtypes [['data :float64]]
-                       :doc "Get a pyobject form a long."}
+                        :argtypes [['data :float64]]
+                        :doc "Get a pyobject form a long."}
 
    :PyLong_AsLongLong {:rettype :int64
                        :argtypes [['pyobj :pointer]]
@@ -299,8 +299,8 @@ Each call must be matched with PyGILState_Release"}
                                   ['module :pointer?]]}
    :PyInstanceMethod_New {:rettype :pointer
                           :argtypes [['pyfn :pointer]]
-                          :doc "Mark a python function as being an instance method."}
-   })
+                          :doc "Mark a python function as being an instance method."}})
+
 
 (defn define-library!
   [python-lib-classname]
@@ -328,7 +328,7 @@ Each call must be matched with PyGILState_Release"}
   "Older definition - excludes Long objects which were made convertible-to-pointer
   in later versions of dtype-next."
   [d]
-  (boolean 
+  (boolean
    (when-not (instance? Long d)
      (dt-ffi/convertible-to-pointer? d))))
 
@@ -385,7 +385,6 @@ Each call must be matched with PyGILState_Release"}
 
 
 (def manual-gil (= "true" (System/getProperty "libpython_clj.manual_gil")))
-
 
 (defmacro check-gil
   "Maybe the most important insurance policy"
@@ -757,21 +756,20 @@ Each call must be matched with PyGILState_Release"}
 (defmacro with-gil
   "Grab the gil and use the main interpreter using reentrant acquire-gil pathway."
   [& body]
-  (if manual-gil
-    `(let [retval# (do ~@body)]
-       (check-error-throw)
-       retval#)
-    `(let [gil-state# (when-not (== 1 (unchecked-long (PyGILState_Check)))
-                        (PyGILState_Ensure))]
-       (try
-         (let [retval# (do ~@body)]
-           (check-error-throw)
-           retval#)
-         (finally
-           (when gil-state#
-             #_(System/gc)
-             (pygc/clear-reference-queue)
-             (PyGILState_Release gil-state#)))))))
+  (let [ffi-body `(let [ret-val# (do ~@body)]
+                    (check-error-throw)
+                    retval#)]
+    (if manual-gil
+      ffi-body
+      `(let [gil-state# (when-not (== 1 (unchecked-long (PyGILState_Check)))
+                          (PyGILState_Ensure))]
+         (try
+           ~ffi-body
+           (finally
+             (when gil-state#
+               #_(System/gc)
+               (pygc/clear-reference-queue)
+               (PyGILState_Release gil-state#))))))))
 
 
 (defn pyobject-type

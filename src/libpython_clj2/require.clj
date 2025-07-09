@@ -157,7 +157,7 @@
   ([prefix req]
    (cond
      (and  (symbol? req)
-           (clojure.string/includes? (name req) ".") )
+           (clojure.string/includes? (name req) "."))
      (throw (Exception.
              (str "After removing prefix list, requirements cannot "
                   "contain periods. Please remove periods from " req)))
@@ -244,9 +244,9 @@
 
    as you prefer.
 
-   Additionally, if you want to keep the namespacing as you have 
-   it in Python, you may prefer to use a relative import 
-   starting from a location of your choosing. If your 
+   Additionally, if you want to keep the namespacing as you have
+   it in Python, you may prefer to use a relative import
+   starting from a location of your choosing. If your
    os.getcwd() => /some/path/foo,
    and your directory structure looks something like:
 
@@ -258,15 +258,15 @@
        └── foo
            └── bar.py
 
-   
+
    (require-python :from \"path\"
                    '[baz.quux :as quux]
                    :from \"path/foo\"
                    'bar)
-   
-   is perfectly acceptable. It probably makes the most 
+
+   is perfectly acceptable. It probably makes the most
    sense to keep you style consistent, but you can mix
-   and match as you see fit between <path>, :from <path>, 
+   and match as you see fit between <path>, :from <path>,
    and {:from <path>}.  <path> can either be a file or a
    directory.  If it is a file, the Python path will be
    set to the directory containing that file.
@@ -285,7 +285,7 @@
 
    Other options more in keeping with traditional PYTHONPATH
    management include:
-   
+
    (require-python 'sys)
    (py/call-attr (py/get-attr sys \"path\")
                  \"append\"

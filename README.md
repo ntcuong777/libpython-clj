@@ -11,8 +11,6 @@ of time in reading the one true documentation (i.e., code) and understand the ov
 Nevertheless, if I found there are changes worth merging, I will try and contribute as I also aim towards being able to call Python 
 freely from Clojure, and tap into the vast ecosystem of Python algorithmic libraries for ML, LLMs, etc.
 
-Information below are cloned as-is from the original project.
-
 ### Version Info
 
 [![Clojars Project](https://img.shields.io/clojars/v/clj-python/libpython-clj.svg)](https://clojars.org/clj-python/libpython-clj)

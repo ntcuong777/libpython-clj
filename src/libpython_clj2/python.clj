@@ -40,6 +40,17 @@ user> (py/py. np linspace 2 3 :num 10)
            [clojure.lang IFn]))
 
 
+;; TODO(ntcuong):
+;; - Define a record type to wrap Python objects in order to provide a safe way to access them.
+;; - Define a protocol for Python objects to implement.
+;;   + Get safe access to Python object.
+;;   + To JVM?
+;; - Update the parts that call to Python to use the new protocol. Maybe wrapping at the library interface
+;; boundary is enough.
+;; - Check the metadata and codegen namespace to see why it cannot generate some names for the `toch.io` package
+;; (e.g., `decode_image`).
+
+
 (set! *warn-on-reflection* true)
 
 (defn initialize!
