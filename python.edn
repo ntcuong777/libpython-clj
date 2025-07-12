@@ -1,0 +1,3 @@
+{:python-executable "dev/.venv/bin/python"
+ ;; :python-home "dev/.venv/lib/python3.13"
+ :python-verbose true}

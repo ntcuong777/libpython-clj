@@ -666,6 +666,18 @@ nil
   `(get-attr ~x ~(py-fn/key-sym-str->str arg)))
 
 
+(defmacro py-item
+  "Item getter syntax. An item is what goes inside the square brackets in Python, e.g.,
+  `obj[item]`, where `item` can be a string, symbol, keyword, etc. that a Python dict can take.
+  Or it can be a number representing an index for a list."
+  [pyobj item]
+  `(get-item ~pyobj ~(if (or (keyword? item)
+                             (symbol? item)
+                             (string? item))
+                       (py-fn/key-sym-str->str item)
+                       item)))
+
+
 (defmacro py.
   "Class/object method syntax.  (py. obj method arg1 arg2 ... argN)
   is equivalent to Python's obj.method(arg1, arg2, ..., argN) syntax."

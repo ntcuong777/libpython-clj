@@ -752,13 +752,12 @@ Each call must be matched with PyGILState_Release"}
        (close [this]
          (unlock-gil gil-state)))))
 
-
 (defmacro with-gil
   "Grab the gil and use the main interpreter using reentrant acquire-gil pathway."
   [& body]
-  (let [ffi-body `(let [ret-val# (do ~@body)]
-                    (check-error-throw)
-                    retval#)]
+  (let [ffi-body `(let [retval# (do ~@body)]
+                     (check-error-throw)
+                     retval#)]
     (if manual-gil
       ffi-body
       `(let [gil-state# (when-not (== 1 (unchecked-long (PyGILState_Check)))
