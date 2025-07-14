@@ -7,7 +7,8 @@
         com.google.guava/guava  {:mvn/version "33.4.8-jre"}}
 
  :aliases {:dev
-           {:extra-deps {criterium/criterium {:mvn/version "0.4.6"}
+           {:extra-paths ["dev"]
+            :extra-deps {criterium/criterium {:mvn/version "0.4.6"}
                          ch.qos.logback/logback-classic {:mvn/version "1.5.18"}}}
            :fastcall
            {:jvm-opts ["-Dlibpython_clj.manual_gil=true"]}

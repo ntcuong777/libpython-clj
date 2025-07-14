@@ -28,13 +28,13 @@ user> (py/py. np linspace 2 3 :num 10)
             [libpython-clj2.python.dechunk-map :refer [dechunk-map]]
             [libpython-clj2.python.copy :as py-copy]
             [libpython-clj2.python.bridge-as-jvm :as py-bridge-jvm]
-            [libpython-clj2.python.bridge-as-python]
             [libpython-clj2.python.io-redirect :as io-redirect]
             [libpython-clj2.python.gc :as pygc]
             [libpython-clj2.python.windows :as win]
             [tech.v3.datatype.ffi :as dtype-ffi]
             [tech.v3.datatype.errors :as errors]
             [clojure.tools.logging :as log]
+            [clojure.string :as str]
             clojure.edn)
   (:import [java.util Map List]
            [clojure.lang IFn]))
@@ -662,6 +662,7 @@ nil
 (defmacro py.-
   "Class/object getter syntax.  (py.- obj attr) is equivalent to
   Python's obj.attr syntax."
+  {:clj-kondo/lint-as 'clojure.core/.}
   [x arg]
   `(get-attr ~x ~(py-fn/key-sym-str->str arg)))
 
@@ -681,6 +682,7 @@ nil
 (defmacro py.
   "Class/object method syntax.  (py. obj method arg1 arg2 ... argN)
   is equivalent to Python's obj.method(arg1, arg2, ..., argN) syntax."
+  {:clj-kondo/lint-as 'clojure.core/.}
   [x method-name & args]
   ;; method-name cast to a string specifically for go and go-loop
   ;; compatability
@@ -727,13 +729,13 @@ nil
            [instance-member & args] form-data
            symbol-str (py-fn/key-sym-str->str instance-member)]
        (cond
-         (clojure.string/starts-with? symbol-str "-")
+         (str/starts-with? symbol-str "-")
          (list #'py.- x (symbol (subs symbol-str 1 (count symbol-str))))
 
-         (clojure.string/starts-with? symbol-str "**")
+         (str/starts-with? symbol-str "**")
          (list* #'py** x (symbol (subs symbol-str 2 (count symbol-str))) args)
 
-         (clojure.string/starts-with? symbol-str "*")
+         (str/starts-with? symbol-str "*")
          (list* #'py* x (symbol (subs symbol-str 1 (count symbol-str))) args)
 
          :else ;; assumed to be method invocation
@@ -778,6 +780,7 @@ nil
   These forms exist for when you need to pass in a map of options
   in the same way you would use the f(*args, **kwargs) forms in
   Python."
+  {:clj-kondo/lint-as 'clojure.core/..}
   [x & args]
   (apply handle-pydotdot x args))
 
@@ -787,15 +790,15 @@ nil
    Given a.b.c, return a.b
    Given a.b.c.d, return a.b.c  etc."
   [x]
-  (clojure.string/join
+  (str/join
    "."
-   (pop (clojure.string/split (str x) #"[.]"))))
+   (pop (str/split (str x) #"[.]"))))
 
 
 (defn- module-path-last-string
   "Given a.b.c.d, return d"
   [x]
-  (last (clojure.string/split (str x) #"[.]")))
+  (last (str/split (str x) #"[.]")))
 
 
 (defn path->py-obj

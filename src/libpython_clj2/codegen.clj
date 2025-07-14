@@ -78,8 +78,8 @@
                        (and (number? vv) (not (neg? vv)) (Double/isInfinite vv)) "##Inf"
                        (and (number? vv) (neg? vv) (Double/isInfinite vv)) "##-Inf"
                        ;;Anything else should be derefed by name from Python
-                       :else (format "(as-jvm/generic-pyobject (py-global-delay (py/get-attr @src-obj* \"%s\")))" k)
-                       )]
+                       :else (format "(as-jvm/generic-pyobject (py-global-delay (py/get-attr @src-obj* \"%s\")))" k))]
+
     (.write writer
       (format "\n\n(def ^{:doc \"%s\"} %s %s)"
         (get-docs v)
@@ -204,6 +204,4 @@ user> (doto (python/list)
                       {:symbol-name-remaps
                        {"AssertionError" "PyAssertionError"
                         "Exception" "PyException"}})
-    (write-namespace! "numpy")
-    )
-  )
+    (write-namespace! "numpy")))
