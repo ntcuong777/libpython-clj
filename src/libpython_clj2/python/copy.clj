@@ -176,7 +176,15 @@
   "These types pass PyMapping_Check but cannot be treated as a collection."
   ;; See github issue#250
   #{:generic-alias
-    :union-type})
+    :union-type
+    :enum-type})
+
+(def sequence-exceptions
+  "These types pass PySequence_Check but cannot be treated as a collection."
+  ;; NOTE: Can :enum-type be represented as some kind of JVM data?
+  #{:generic-alias
+    :union-type
+    :enum-type})
 
 (defmethod py-proto/pyobject->jvm :default
   [pyobj & [options]]
@@ -200,7 +208,8 @@
             (py-ffi/PyErr_Clear)
             (python->jvm-copy-persistent-vector pyobj))))
       ;;Sequences become persistent vectors
-      (= 1 (py-ffi/PySequence_Check pyobj))
+      (and (= 1 (py-ffi/PySequence_Check pyobj))
+           (not (sequence-exceptions python-type-keyword)))
       (python->jvm-copy-persistent-vector pyobj)
       :else
       {:type python-type-keyword

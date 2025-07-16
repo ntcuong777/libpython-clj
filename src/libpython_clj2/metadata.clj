@@ -256,6 +256,7 @@
                       (log/warnf "Metadata generation failed for %s:%s"
                                  (.toString item)
                                  att-name)
+                      ;; (.printStackTrace e)
                       nil)))))
          (remove nil?)
          (into (base-pyobj-map item)))))

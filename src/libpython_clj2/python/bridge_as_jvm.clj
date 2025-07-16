@@ -384,15 +384,15 @@
 ;;utility fn to generate IFn arities
 (defn- emit-args
   [bodyf varf]
-   (let [argify (fn [n argfn bodyf]
-                  (let [raw  `[~'this ~@(map #(symbol (str "arg" %))
-                                             (range n))]]
-                    `~(bodyf (argfn raw))))]
-     (concat (for [i (range 21)]
-               (argify i identity bodyf))
-             [(argify 21 (fn [xs]
-                          `[~@(butlast xs) ~'arg20-obj-array])
-                     varf)])))
+  (let [argify (fn [n argfn bodyf]
+                 (let [raw  `[~'this ~@(map #(symbol (str "arg" %))
+                                            (range n))]]
+                   `~(bodyf (argfn raw))))]
+    (concat (for [i (range 21)]
+              (argify i identity bodyf))
+            [(argify 21 (fn [xs]
+                         `[~@(butlast xs) ~'arg20-obj-array])
+                    varf)])))
 
 ;;Python specific interop wrapper for IFn invocations.
 (defn- emit-py-args []
